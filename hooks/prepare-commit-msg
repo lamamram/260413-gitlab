@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# dans .git/COMMIT_EDITMSG, on trouve le message de commit
+COMMIT_MSG_FILE=$1
+
+msg=$(cat $COMMIT_MSG_FILE)
+# rev-parse: commande de plomberie
+current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+issue_id=$(echo "$current_branch" | cut -d '-' -f 1)
+
+# si çà matche pas avec un issue_id
+re='^[0-9]+$'
+if ! [[ $issue_id =~ $re ]]; then exit 0; fi
+
+echo "$msg #$issue_id" > $COMMIT_MSG_FILE

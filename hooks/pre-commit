@@ -1,0 +1,7 @@
+#!/bin/sh
+scope=$(git diff --cached --name-only --diff-filter=AMR | grep -E '\.py$')
+if [ -z "$scope" ];then
+  exit 0
+fi
+echo "$scope" | xargs python -m black --config=./app/pyproject.toml --quiet
+echo "$scope" | xargs git add

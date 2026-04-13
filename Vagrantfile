@@ -32,6 +32,7 @@ Vagrant.configure(2) do |config|
   # cidr      = "24"
 
   ## MAIN
+  ## commentaire intéressant
   
   config.vm.define "#{hostname}" do |machine|
     machine.vm.provider "virtualbox" do |v|

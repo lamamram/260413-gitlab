@@ -2,8 +2,3 @@ function_1_1(){
   code 11
   return
 }
-
-function_1_2(){
-  code 12
-  return
-}

@@ -2,5 +2,6 @@ import script1
 
 function_f1_1(){
   code f11
+  bode f11 bis
   return
 }

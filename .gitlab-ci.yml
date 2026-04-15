@@ -1,5 +1,7 @@
 variables:
   CICD_IMAGE_TAG: 3.14.4-slim-trixie
+  # en gitlab les valeurs d'environnement ne sont que des chaînes de caractèress
+  TRIGGER_CACHE: "off"
 
 stages:
   - installing
@@ -20,13 +22,13 @@ generate deps:
     paths:
       - venv/
     policy: push
-  # rules: liste de règles. chaque règle vraie permet d'exécuter le job (OU)
   rules:
-    # toutes les clauses d'une règle doivent être vraies pour que la règle soit vraie (ET)
-    # changes: si l'un des fichiers listés a été modifié, la clause est vraie
     - changes:
         - app/requirements.txt
         - app/requirements-dev.txt
+    # règle manuelle pour forcer la génération des dépendances
+    # opérateur possibles : ==, !=, (regex: =~, !~)
+    - if: $TRIGGER_CACHE == "on"
 
 
 test:

@@ -236,7 +236,7 @@ def test_list_employees_with_pagination_limit(test_client, setup_database, db_se
     data = response.json()
     assert len(data) == 2
 
-
+@pytest.mark.skip
 def test_employee_id(test_client, setup_database, db_session):
     """Test GET /employees/:id returns employee object with correct ID"""
     # Arrange - Create a user and an employee

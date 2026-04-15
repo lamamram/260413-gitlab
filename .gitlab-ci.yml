@@ -15,15 +15,18 @@ generate deps:
     - source venv/bin/activate
     - pip install -r app/requirements.txt
     - pip install -r app/requirements-dev.txt
-  # cache de récolte du dossier venv, pour le placer dans un volume
   cache:
-    # utilisation d'une variable prédéfinie pour dynamiser le nom du cache
-    # métier: pour préserver le cache de la branche main
     key: cache-deps-${CI_COMMIT_BRANCH}
     paths:
       - venv/
-    # création pure
     policy: push
+  # rules: liste de règles. chaque règle vraie permet d'exécuter le job (OU)
+  rules:
+    # toutes les clauses d'une règle doivent être vraies pour que la règle soit vraie (ET)
+    # changes: si l'un des fichiers listés a été modifié, la clause est vraie
+    - changes:
+        - app/requirements.txt
+        - app/requirements-dev.txt
 
 
 test:
@@ -35,13 +38,7 @@ test:
     - source venv/bin/activate
     - cd app/
     - pytest -m "not e2e"
-  # cache d'utilisation du cache
   cache:
     key: cache-deps-${CI_COMMIT_BRANCH}
-    # utilisation pure
     policy: pull
-    # justification: $GIT_STRATEGY (settings -> CICD -> General pipelines) 
-    # est à fetch, donc le code source est réutilisé mais il est nettoyé avec git clean -xf
-    # MAIS comme le cache arrive nécessairement Untracked ou ignoré et donc il est dégagé !!!
-    # donc untracked: true pour préserver le cache
     untracked: true

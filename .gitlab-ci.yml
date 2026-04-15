@@ -1,3 +1,6 @@
+# image par défaut du pipeline, peut être surchargée par l'image des jobs
+image: python:${CICD_IMAGE_TAG}
+
 variables:
   CICD_IMAGE_TAG: 3.14.4-slim-trixie
   # en gitlab les valeurs d'environnement ne sont que des chaînes de caractèress
@@ -11,7 +14,6 @@ generate deps:
   tags:
     - formation
   stage: installing
-  image: python:${CICD_IMAGE_TAG}
   script:
     - python -m venv venv
     - source venv/bin/activate
@@ -35,7 +37,6 @@ test:
   tags:
     - formation
   stage: testing
-  image: python:${CICD_IMAGE_TAG}
   script:
     - source venv/bin/activate
     - cd app/

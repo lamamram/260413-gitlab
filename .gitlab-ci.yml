@@ -36,11 +36,12 @@ test:
   script:
     - source venv/bin/activate
     - cd app/
-    # ">" : permet de convertir les sauts de ligne en espace
     - >
       pytest -m "not e2e" 
       --junit-xml=reports/junit.xml 
       --cov=. --cov-report=term
+  # regex pour extraire le pourcentage de couverture du rapport de pytest-cov
+  coverage: /TOTAL\s+\d+\s+\d+\s+(\d+%)/
   cache:
     key: cache-deps-${CI_COMMIT_BRANCH}
     policy: pull

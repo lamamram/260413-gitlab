@@ -1,8 +1,15 @@
 # nom du job: arbitraire
 test:
-  # assocation entre le job et le runner
   tags:
     - formation
-  # script à exécuter
+  # image du job: pour exécuter du python
+  image: python:3.14.4-slim-trixie
+  # commandes préparatoires: installation des dépendances dans un venv
+  before_script:
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r app/requirements.txt
+    - pip install -r app/requirements-dev.txt
   script:
-    - echo "TESTs !"
+    - cd app/
+    - pytest -m "not e2e"

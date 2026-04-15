@@ -44,16 +44,13 @@ test:
     key: cache-deps-${CI_COMMIT_BRANCH}
     policy: pull
     untracked: true
-  # artefacts: n'importe quel document généré par le job
   artifacts:
-    ## ici untracked permet de faire sortit tous les fichiers "U"
-    # untracked: false
-    ## paths: accès en téléchargement ET transfert vers les jobs suivants
+    when: always
+    access: all
+    expire_in: 1 hour
     paths:
       - app/reports/junit.xml
-    ## ici when regarde le statut du job, et pas du pipeline
-    when: always
-    ## niveau de confidentialité des artefacts, all, maintainer, developper
-    access: all
-    ## rotation des artefacts
-    expire_in: 1 hour
+    # rapports spéciaux liés à des formats et technos attendus par Gitlab
+    # pour incrustation dans la GUI
+    reports:
+      junit: app/reports/junit.xml

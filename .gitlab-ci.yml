@@ -1,5 +1,6 @@
 # image par défaut du pipeline, peut être surchargée par l'image des jobs
-image: python:${CICD_IMAGE_TAG}
+# image: gitlab.lan.fr:5050/formation/dev/python:${CICD_IMAGE_TAG}
+image: ${CI_REGISTRY_IMAGE}/python:${CICD_IMAGE_TAG}
 
 variables:
   CICD_IMAGE_TAG: 3.14.4-slim-trixie

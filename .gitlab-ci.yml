@@ -1,15 +1,23 @@
-# nom du job: arbitraire
-test:
+# variables globales du pipeline
+variables:
+  # variables surchargeables (ex: exécution manuelle)
+  CICD_IMAGE_TAG: 3.14.4-slim-trixie
+
+generate deps:
   tags:
     - formation
-  # image du job: pour exécuter du python
-  image: python:3.14.4-slim-trixie
-  # commandes préparatoires: installation des dépendances dans un venv
-  before_script:
+  image: python:${CICD_IMAGE_TAG}
+  script:
     - python -m venv venv
     - source venv/bin/activate
     - pip install -r app/requirements.txt
     - pip install -r app/requirements-dev.txt
+
+test:
+  tags:
+    - formation
+  image: python:${CICD_IMAGE_TAG}
   script:
+    - source venv/bin/activate
     - cd app/
     - pytest -m "not e2e"

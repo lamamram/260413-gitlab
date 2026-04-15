@@ -39,7 +39,9 @@ test:
     - >
       pytest -m "not e2e" 
       --junit-xml=reports/junit.xml 
-      --cov=. --cov-report=term
+      --cov=. 
+      --cov-report=term 
+      --cov-report=xml:reports/coverage.xml
   # regex pour extraire le pourcentage de couverture du rapport de pytest-cov
   coverage: /TOTAL\s+\d+\s+\d+\s+(\d+%)/
   cache:
@@ -51,8 +53,12 @@ test:
     access: all
     expire_in: 1 hour
     paths:
-      - app/reports/junit.xml
+      - app/reports/coverage.xml
     # rapports spéciaux liés à des formats et technos attendus par Gitlab
     # pour incrustation dans la GUI
     reports:
       junit: app/reports/junit.xml
+      # rapport spécial pour incruster les lignes couvertes ou non dans la MR
+      coverage_report:
+        coverage_format: cobertura
+        path: app/reports/coverage.xml

@@ -39,7 +39,8 @@ test:
     # ">" : permet de convertir les sauts de ligne en espace
     - >
       pytest -m "not e2e" 
-      --junit-xml=reports/junit.xml
+      --junit-xml=reports/junit.xml 
+      --cov=. --cov-report=term
   cache:
     key: cache-deps-${CI_COMMIT_BRANCH}
     policy: pull

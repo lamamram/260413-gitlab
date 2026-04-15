@@ -1,11 +1,15 @@
-# variables globales du pipeline
 variables:
-  # variables surchargeables (ex: exécution manuelle)
   CICD_IMAGE_TAG: 3.14.4-slim-trixie
+
+# stages: grandes étapes du pipeline, elles sont exécutées dans l'ordre
+stages:
+  - installing
+  - testing
 
 generate deps:
   tags:
     - formation
+  stage: installing
   image: python:${CICD_IMAGE_TAG}
   script:
     - python -m venv venv
@@ -16,6 +20,7 @@ generate deps:
 test:
   tags:
     - formation
+  stage: testing
   image: python:${CICD_IMAGE_TAG}
   script:
     - source venv/bin/activate

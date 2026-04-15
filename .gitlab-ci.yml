@@ -1,10 +1,7 @@
-# image par défaut du pipeline, peut être surchargée par l'image des jobs
-# image: gitlab.lan.fr:5050/formation/dev/python:${CICD_IMAGE_TAG}
 image: ${CI_REGISTRY_IMAGE}/python:${CICD_IMAGE_TAG}
 
 variables:
   CICD_IMAGE_TAG: 3.14.4-slim-trixie
-  # en gitlab les valeurs d'environnement ne sont que des chaînes de caractèress
   TRIGGER_CACHE: "off"
 
 stages:
@@ -29,8 +26,6 @@ generate deps:
     - changes:
         - app/requirements.txt
         - app/requirements-dev.txt
-    # règle manuelle pour forcer la génération des dépendances
-    # opérateur possibles : ==, !=, (regex: =~, !~)
     - if: $TRIGGER_CACHE == "on"
 
 
@@ -41,8 +36,24 @@ test:
   script:
     - source venv/bin/activate
     - cd app/
-    - pytest -m "not e2e"
+    # ">" : permet de convertir les sauts de ligne en espace
+    - >
+      pytest -m "not e2e" 
+      --junit-xml=reports/junit.xml
   cache:
     key: cache-deps-${CI_COMMIT_BRANCH}
     policy: pull
     untracked: true
+  # artefacts: n'importe quel document généré par le job
+  artifacts:
+    ## ici untracked permet de faire sortit tous les fichiers "U"
+    # untracked: false
+    ## paths: accès en téléchargement ET transfert vers les jobs suivants
+    paths:
+      - app/reports/junit.xml
+    ## ici when regarde le statut du job, et pas du pipeline
+    when: always
+    ## niveau de confidentialité des artefacts, all, maintainer, developper
+    access: all
+    ## rotation des artefacts
+    expire_in: 1 hour

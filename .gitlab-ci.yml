@@ -2,6 +2,11 @@
 .tag_rules: &tag_rules
   - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/
 
+.use_cache: &use_cache
+  key: cache-deps-${CI_COMMIT_BRANCH}
+  policy: pull
+  untracked: true
+
 image: ${CI_REGISTRY_IMAGE}/python:${CICD_IMAGE_TAG}
 
 variables:
@@ -14,6 +19,7 @@ stages:
   - qualifying
   - packaging
   - staging
+  - browsing
 
 generate deps:
   tags:
@@ -50,10 +56,7 @@ generate deps:
       --cov-report=term 
       --cov-report=xml:reports/coverage.xml
   coverage: /TOTAL\s+\d+\s+\d+\s+(\d+%)/
-  cache:
-    key: cache-deps-${CI_COMMIT_BRANCH}
-    policy: pull
-    untracked: true
+  cache: *use_cache
   artifacts:
     when: always
     access: all
@@ -82,7 +85,7 @@ generate deps:
       -Dsonar.python.coverage.reportPaths=app/reports/coverage.xml
       -Dsonar.qualitygate.wait=true
 
-package:
+.package:
   tags:
     - formation
   stage: packaging
@@ -101,7 +104,7 @@ package:
   # alias yaml *<ref>: on réutilise tel quel le contenu d'une clé référencée
   rules: *tag_rules
 
-trigger_staging:
+.trigger_staging:
   stage: staging
   trigger:
     project: formation/ops
@@ -111,3 +114,30 @@ trigger_staging:
     name: staging
     url: https://dawan.fr
   rules: *tag_rules
+
+e2e:
+  stage: browsing
+  tags:
+    - formation
+  # conteneur "sidecars" créés à la volée pour fournir des services au job
+  services:
+    - name: selenium/standalone-firefox:144.0-geckodriver-0.36-20260202
+      # DNS du service => pour connecter le client au serveur
+      alias: selenium-server
+  script:
+    - source venv/bin/activate
+    - cd app/
+    - >
+      pytest -m "e2e"
+      --junit-xml=reports/e2e.xml 
+  artifacts:
+    untracked: false
+    when: on_success
+    access: all
+    expire_in: 1 hour
+    reports:
+      junit: app/reports/e2e.xml
+  cache: *use_cache
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+$/
+    - if: $CI_COMMIT_BRANCH == "main"

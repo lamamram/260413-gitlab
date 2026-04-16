@@ -31,7 +31,7 @@ generate deps:
     - if: $TRIGGER_CACHE == "on"
 
 
-test:
+.test:
   tags:
     - formation
   stage: testing
@@ -89,6 +89,10 @@ package:
     - formation
   stage: packaging
   script:
-    - echo "package"
+    - >
+      git archive 
+      --prefix=$CI_COMMIT_TAG 
+      -o $CI_COMMIT_TAG.tar.gz $CI_COMMIT_TAG
+    - ls -al
   rules:
     - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/

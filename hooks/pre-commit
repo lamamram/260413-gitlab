@@ -1,7 +1,16 @@
 #!/bin/sh
+
+# possibilité d'activer auto. le venv dans le hook s'il est dans le projet
+# source .venv/Scripts/activate
+
+# --name-only est comme --stat mais plus aride
+# --diff-filter pour enlever les fichiers supprimés qui ne sont plus présents dans le projet
 scope=$(git diff --cached --name-only --diff-filter=AMR | grep -E '\.py$')
+
+## s'il n'ya pas de fichier à formater on sort au cas où l'outil intrégrerait un formatage automatique complet !!!
 if [ -z "$scope" ];then
   exit 0
 fi
+
 echo "$scope" | xargs python -m black --config=./app/pyproject.toml --quiet
 echo "$scope" | xargs git add

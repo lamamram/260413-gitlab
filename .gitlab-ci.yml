@@ -9,6 +9,7 @@ stages:
   - testing
   - qualifying
   - packaging
+  - staging
 
 generate deps:
   tags:
@@ -61,20 +62,13 @@ generate deps:
         coverage_format: cobertura
         path: app/reports/coverage.xml
 
-# ".": préfixer un job avec un "." le désactive
 .sonar:
   tags:
     - formation
   stage: qualifying
   image:
     name: sonarsource/sonar-scanner-cli:12
-    ## REM: la clé image est "polymorphique" et peut contenir une str ou un map
-    # à l'époque: on devait neutraliser l'entrypoint
-    # entrypoint: [""]
   script:
-    # on peut aussi exclure des dossiers: -Dsonar.exclusions=app/tests/**
-    # on peut assu exlucre des dossiers du coverage: -Dsonar.coverage.exclusions=**/tests/*
-    # OU dans projet -> project settings -> General Settings -> Analysis Scope
     - >
       sonar-scanner
       -Dsonar.projectKey=dev
@@ -94,9 +88,6 @@ package:
       git archive 
       --prefix=$CI_COMMIT_TAG 
       -o $CI_COMMIT_TAG.tar.gz $CI_COMMIT_TAG
-    # upload l'archive dans le registre de paquet générique de gitlab
-    # Deploy -> Packages registry <Generic> (https://docs.gitlab.com/user/packages/generic_packages/?tab=CI%2FCD+job+token)
-    - ls -al
     - >
       curl 
       -L -k
@@ -106,3 +97,20 @@ package:
   rules:
     - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/
 
+## ceci n'est pas un job, mais un déclenchement de pipeline (multi-project pipeline)
+trigger_staging:
+  stage: staging
+  # trigger != script
+  trigger:
+    project: formation/ops
+    branch: main
+    # le pipeline déclenché bloque le pipeline courant
+    strategy: depend
+  environment:
+    # staging et prod sont des environnements "en dur" dans gitlab
+    # staging et prod sont des termes consacrés
+    # mais on peut aussi les créer dynamiquement
+    name: staging
+    url: https://dawan.fr
+  rules:
+    - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/

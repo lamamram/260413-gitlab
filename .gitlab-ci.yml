@@ -8,6 +8,7 @@ stages:
   - installing
   - testing
   - qualifying
+  - packaging
 
 generate deps:
   tags:
@@ -82,3 +83,12 @@ test:
       -Dsonar.login=${SONAR_TOKEN}
       -Dsonar.python.coverage.reportPaths=app/reports/coverage.xml
       -Dsonar.qualitygate.wait=true
+
+package:
+  tags:
+    - formation
+  stage: packaging
+  script:
+    - echo "package"
+  rules:
+    - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/

@@ -1,3 +1,7 @@
+# &: référence à une ancre ou un alias YAML
+.tag_rules: &tag_rules
+  - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/
+
 image: ${CI_REGISTRY_IMAGE}/python:${CICD_IMAGE_TAG}
 
 variables:
@@ -94,23 +98,16 @@ package:
       --header "JOB-TOKEN: ${CI_JOB_TOKEN}"
       --upload-file ${CI_COMMIT_TAG}.tar.gz
       "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/dev/${CI_COMMIT_TAG}/${CI_COMMIT_TAG}.tar.gz"
-  rules:
-    - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/
+  # alias yaml *<ref>: on réutilise tel quel le contenu d'une clé référencée
+  rules: *tag_rules
 
-## ceci n'est pas un job, mais un déclenchement de pipeline (multi-project pipeline)
 trigger_staging:
   stage: staging
-  # trigger != script
   trigger:
     project: formation/ops
     branch: main
-    # le pipeline déclenché bloque le pipeline courant
     strategy: depend
   environment:
-    # staging et prod sont des environnements "en dur" dans gitlab
-    # staging et prod sont des termes consacrés
-    # mais on peut aussi les créer dynamiquement
     name: staging
     url: https://dawan.fr
-  rules:
-    - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/
+  rules: *tag_rules

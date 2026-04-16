@@ -60,7 +60,8 @@ test:
         coverage_format: cobertura
         path: app/reports/coverage.xml
 
-sonar:
+# ".": préfixer un job avec un "." le désactive
+.sonar:
   tags:
     - formation
   stage: qualifying

@@ -58,3 +58,15 @@ test:
       coverage_report:
         coverage_format: cobertura
         path: app/reports/coverage.xml
+
+sonar:
+  tags:
+    - formation
+  stage: testing
+  script:
+    - >
+      sonar-scanner
+      -Dsonar.projectKey=dev
+      -Dsonar.sources=./app
+      -Dsonar.host.url=http://gitlab.lan.fr:9000
+      -Dsonar.login=${SONAR_TOKEN}

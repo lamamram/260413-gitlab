@@ -7,6 +7,7 @@ variables:
 stages:
   - installing
   - testing
+  - qualifying
 
 generate deps:
   tags:
@@ -62,11 +63,21 @@ test:
 sonar:
   tags:
     - formation
-  stage: testing
+  stage: qualifying
+  image:
+    name: sonarsource/sonar-scanner-cli:12
+    ## REM: la clé image est "polymorphique" et peut contenir une str ou un map
+    # à l'époque: on devait neutraliser l'entrypoint
+    # entrypoint: [""]
   script:
+    # on peut aussi exclure des dossiers: -Dsonar.exclusions=app/tests/**
+    # on peut assu exlucre des dossiers du coverage: -Dsonar.coverage.exclusions=**/tests/*
+    # OU dans projet -> project settings -> General Settings -> Analysis Scope
     - >
       sonar-scanner
       -Dsonar.projectKey=dev
       -Dsonar.sources=./app
       -Dsonar.host.url=http://gitlab.lan.fr:9000
       -Dsonar.login=${SONAR_TOKEN}
+      -Dsonar.python.coverage.reportPaths=app/reports/coverage.xml
+      -Dsonar.qualitygate.wait=true

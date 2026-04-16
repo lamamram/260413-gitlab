@@ -1,5 +1,8 @@
 #!/bin/sh
 
+## possibilité de charger les hooks depuis un dossier du projet pour les partager entre les devs
+## git config core.hooksPath hooks
+
 # possibilité d'activer auto. le venv dans le hook s'il est dans le projet
 # source .venv/Scripts/activate
 

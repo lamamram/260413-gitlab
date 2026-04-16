@@ -105,3 +105,4 @@ package:
       "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/dev/${CI_COMMIT_TAG}/${CI_COMMIT_TAG}.tar.gz"
   rules:
     - if: $CI_COMMIT_TAG =~ /v\d+\.\d+/
+

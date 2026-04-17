@@ -36,7 +36,7 @@ stages:
       auth_json: ./auth.json
       message: "give me the capital of France"
 
-.generate deps:
+generate deps:
   tags:
     - formation
   stage: installing
@@ -57,7 +57,7 @@ stages:
     - if: $TRIGGER_CACHE == "on"
 
 
-.test:
+test:
   tags:
     - formation
   stage: testing
@@ -84,7 +84,7 @@ stages:
         coverage_format: cobertura
         path: app/reports/coverage.xml
 
-.sonar:
+sonar:
   tags:
     - formation
   stage: qualifying
@@ -119,7 +119,7 @@ package:
   # alias yaml *<ref>: on réutilise tel quel le contenu d'une clé référencée
   rules: *tag_rules
 
-.release:
+release:
   stage: packaging
   image: registry.gitlab.com/gitlab-org/cli:latest
   ### PB de tls non signé (worarounds: https://docs.gitlab.com/runner/configuration/tls-self-signed/)
@@ -146,7 +146,7 @@ package:
     url: https://dawan.fr
   rules: *tag_rules
 
-.e2e:
+e2e:
   stage: browsing
   tags:
     - formation
@@ -174,7 +174,7 @@ package:
   rules:
     - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+$/ || $CI_COMMIT_BRANCH == "main"
 
-.production:
+production:
   stage: deploying
   tags:
     - formation

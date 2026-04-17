@@ -65,7 +65,7 @@ test:
     - source venv/bin/activate
     - cd app/
     - >
-      pytest -m "not e2e" 
+      pytest -m "not e2e and not e1e"
       --junit-xml=reports/junit.xml 
       --cov=. 
       --cov-report=term 

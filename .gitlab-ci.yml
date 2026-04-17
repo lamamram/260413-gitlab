@@ -24,7 +24,7 @@ stages:
 
 # https://gitlab.com/nagyv/gitlab-opencode
 # le /opencode correspond au dossier templates/opencode.yml et le @main correspond à la branche du projet gitlab-opencode
-include:
+.include:
   - component: gitlab.lan.fr/formation/gitlab-opencode/opencode@main
     # surcharge des variables d'entrée du template opencode
     inputs:
@@ -36,7 +36,7 @@ include:
       auth_json: ./auth.json
       message: "give me the capital of France"
 
-generate deps:
+.generate deps:
   tags:
     - formation
   stage: installing
@@ -100,7 +100,7 @@ generate deps:
       -Dsonar.python.coverage.reportPaths=app/reports/coverage.xml
       -Dsonar.qualitygate.wait=true
 
-.package:
+package:
   tags:
     - formation
   stage: packaging
@@ -108,7 +108,7 @@ generate deps:
   script:
     - >
       git archive 
-      --prefix=$CI_COMMIT_TAG 
+      --prefix=$CI_COMMIT_TAG/
       -o $CI_COMMIT_TAG.tar.gz $CI_COMMIT_TAG
     - >
       curl 
@@ -146,7 +146,7 @@ generate deps:
     url: https://dawan.fr
   rules: *tag_rules
 
-e2e:
+.e2e:
   stage: browsing
   tags:
     - formation

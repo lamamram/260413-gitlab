@@ -28,6 +28,7 @@ load:
       --location 
       --header "JOB-TOKEN: $CI_JOB_TOKEN"
       "${CI_API_V4_URL}/projects/1/packages/generic/dev/v1.4/v1.4.tar.gz"
+      -o v1.4.tar.gz
   # artifacts:
   #   expire_in: "5 minutes"
   #   paths:

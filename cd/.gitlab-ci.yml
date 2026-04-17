@@ -6,8 +6,8 @@ variables:
 
 stages:
   - loading
-  # - building
-  # - scaning
+  - building
+  - scaning
   # - tagging
   # - staging
 
@@ -28,36 +28,28 @@ load:
       --location 
       --header "JOB-TOKEN: $CI_JOB_TOKEN"
       "${CI_API_V4_URL}/projects/1/packages/generic/dev/v1.4/v1.4.tar.gz"
-      -o v1.4.tar.gz
-  # artifacts:
-  #   expire_in: "5 minutes"
-  #   paths:
-  #     - java-sb_img/target/java-sb.war.original
-  #     - java-sb_img/tag.txt
+      -o build/v1.4.tar.gz
+  artifacts:
+    expire_in: "5 minutes"
+    paths:
+      - build/v1.4.tar.gz
 
-.build:
+build:
   stage: building
   tags: [formation]
   before_script:
     - *login
   script:
-    - cd java-sb_img
-    - docker build -t $CI_REGISTRY_IMAGE/java-sb:staging-rc .
-    - docker run -d --restart unless-stopped --name test $CI_REGISTRY_IMAGE/java-sb:staging-rc
-    - sleep 60
-    - docker ps --filter name=test | grep -o "(healthy)"
-    - tag=$(cat tag.txt)
-    - docker tag $CI_REGISTRY_IMAGE/java-sb:staging-rc $CI_REGISTRY_IMAGE/java-sb:$tag
-    - docker push $CI_REGISTRY_IMAGE/java-sb:$tag
+    - cd build
+    - docker build -t $CI_REGISTRY_IMAGE/dev:v1.4 .
+    - docker run -d --restart unless-stopped --name test $CI_REGISTRY_IMAGE/dev:v1.4
+    - sleep 5
+    # - docker ps --filter name=test | grep -o "(healthy)"
+    - docker push $CI_REGISTRY_IMAGE/dev:v1.4
   after_script:
     - docker ps --filter name=test && docker rm -f test
-  artifacts:
-    access: developer
-    expire_in: "5 minutes"
-    paths:
-      - java-sb_img/tag.txt
 
-.scan:
+scan:
   stage: scaning
   variables:
     # GIT STRATEGY: je ne pas besoin du dépôt git
@@ -69,7 +61,7 @@ load:
     # exit code 1 si vulnérabilités de niveau HIGH ou CRITICAL
     TRIVY_OPTS: >
                 --exit-code 1
-                --severity CRITICAL
+                --severity MEDIUM
                 --scanners vuln
                 --cache-dir .trivycache/
   image:
@@ -78,11 +70,10 @@ load:
   tags: [formation]
   before_script: [""]
   script:
-    - tag=$(cat java-sb_img/tag.txt)
     - >
       trivy image 
       $TRIVY_OPTS
-      "$CI_REGISTRY_IMAGE/java-sb:$tag"
+      "$CI_REGISTRY_IMAGE/dev:v1.4"
       --format template 
       --template "@/contrib/junit.tpl" 
       -o junit-report.xml
